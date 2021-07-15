@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  role_name: adguard_home
+  author: Dominik Lenhardt
+  description: Installing and configure ad-blocking DNS-server Adguard Home (https://github.com/AdguardTeam/AdGuardHome).
+  license: "MIT"
+  min_ansible_version: 2.9
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - bionic
+  galaxy_tags:
+  - system
+  - network
+  - linux
+  - adguard
+  - dns
+  - adblocking
+  - networking
+dependencies: []

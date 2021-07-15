@@ -1,0 +1,5 @@
+skip_list:
+- '106'  # Role name {} does not match ``^[a-z][a-z0-9_]+$`` pattern'
+warn_list:  # or 'skip_list' to silence them completely
+  - command-instead-of-module  # Using command rather than module
+  - var-spacing  # Variables should have spaces before and after:  {{ var_name }}

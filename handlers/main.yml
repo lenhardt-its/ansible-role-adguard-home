@@ -1,0 +1,15 @@
+---
+- name: restart adguard
+  systemd:
+    daemon_reload: true
+    name: adguard
+    state: restarted
+  become: true
+  tags: adguard
+
+- name: reload adguard
+  systemd:
+    name: adguard
+    state: reloaded
+  become: true
+  tags: adguard

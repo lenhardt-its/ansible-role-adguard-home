@@ -1,0 +1,161 @@
+---
+- name: install dependencies
+  apt:
+    name:
+      - gnupg
+      - ca-certificates
+      - apt-transport-https
+      - apache2-utils
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  become: yes
+  tags: adguard
+
+- name: create system group
+  group:
+    name: "{{ adguard_system_group }}"
+    system: true
+    state: present
+  become: true
+  tags: adguard
+
+- name: create system user
+  user:
+    name: "{{ adguard_system_user }}"
+    system: true
+    shell: "/usr/sbin/nologin"
+    group: "{{ adguard_system_group }}"
+    createhome: false
+  become: true
+  tags: adguard
+
+- name: create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ adguard_system_user }}"
+    group: "{{ adguard_system_group }}"
+    mode: 0755
+  with_items:
+    - "{{ adguard_config_dir }}"
+    - "{{ adguard_db_dir }}"
+  become: true
+  tags: adguard
+
+- name: check if is installed
+  stat:
+    path: "{{ adguard_binary_install_dir }}/adguard"
+  register: __adguard_is_installed
+  become: true
+  tags: adguard
+
+- name: gather currently installed version (if any)
+  command: "{{ adguard_binary_install_dir }}/adguard --version"
+  args:
+    warn: false
+  changed_when: false
+  register: __adguard_current_version_output
+  when: __adguard_is_installed.stat.exists
+  become: true
+  tags: adguard
+
+- name: get latest release
+  uri:
+    url: "https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest"
+    method: GET
+    return_content: true
+    status_code: "200"
+    body_format: json
+    validate_certs: false
+    user: "{{ lookup('env', 'GH_USER') | default(omit) }}"
+    password: "{{ lookup('env', 'GH_TOKEN') | default(omit) }}"
+  environment: "{{ proxy_env }}"
+  no_log: "{{ not lookup('env', 'MOLECULE_DEBUG') | bool }}"
+  register: _latest_release
+  until: _latest_release.status == 200
+  retries: 5
+  become: true
+  tags: adguard
+  when: adguard_version == "latest"
+
+- name: "set version to {{ _latest_release.json.tag_name[1:] }}"
+  set_fact:
+    adguard_version: "{{ _latest_release.json.tag_name[1:] }}"
+  become: true
+  tags: adguard
+  when: adguard_version == "latest"
+
+- name: download binary to local folder
+  get_url:
+    url: "https://github.com/AdguardTeam/AdGuardHome/releases/download/v{{ adguard_version }}/AdGuardHome_linux_{{ go_arch }}.tar.gz"
+    dest: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
+  environment: "{{ proxy_env }}"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  # run_once: true # <-- this can't be set due to multi-arch support
+  delegate_to: localhost
+  check_mode: false
+  become: true
+  tags: adguard
+  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[2]|regex_search('[0-9.]+') != adguard_version)
+
+- name: unpack binaries
+  unarchive:
+    src: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp"
+    creates: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}/adguard"
+  delegate_to: localhost
+  check_mode: false
+  become: true
+  tags: adguard
+  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[2]|regex_search('[0-9.]+') != adguard_version)
+
+- name: propagate binaries
+  copy:
+    src: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}/AdGuardHome/AdGuardHome"
+    dest: "{{ adguard_binary_install_dir }}/adguard"
+    mode: 0755
+    owner: root
+    group: root
+  notify: restart adguard
+  become: true
+  tags: adguard
+  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[2]|regex_search('[0-9.]+') != adguard_version)
+
+- name: copy adguard config
+  template:
+    force: true
+    src: adguard.yaml.j2
+    dest: "{{ adguard_config_dir }}/config.yaml"
+    owner: "{{ adguard_system_user }}"
+    group: "{{ adguard_system_group }}"
+    mode: 0644
+    validate: "{{ adguard_binary_install_dir }}/adguard --check-config -c %s"
+  notify: restat adguard
+  become: true
+  tags:
+    - adguard
+    - adguard_config
+
+- name: create systemd service unit
+  template:
+    src: adguard.service.j2
+    dest: /etc/systemd/system/adguard.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart adguard
+  become: true
+  tags: adguard
+
+- name: start and enable adguard service
+  systemd:
+    daemon_reload: true
+    name: adguard
+    state: started
+    enabled: true
+  become: true
+  tags: adguard

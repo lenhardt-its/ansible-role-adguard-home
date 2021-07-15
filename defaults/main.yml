@@ -26,7 +26,7 @@ adguard_config:
   web_session_ttl: 720
   dns:
     bind_hosts:
-    - 0.0.0.0
+    - "{{ adguard_web_listen_address }}"
     port: 53
     statistics_interval: 1
     querylog_enabled: true
@@ -100,43 +100,43 @@ adguard_config:
     private_key: ""
     certificate_path: ""
     private_key_path: ""
-    filters:
-    - enabled: true
-      url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
-      name: AdGuard DNS filter
-      id: 1
-    - enabled: true
-      url: https://adaway.org/hosts.txt
-      name: AdAway Default Blocklist
-      id: 2
-    whitelist_filters: []
-    user_rules: []
-    dhcp:
-      enabled: false
-      interface_name: ""
-      dhcpv4:
-        gateway_ip: ""
-        subnet_mask: ""
-        range_start: ""
-        range_end: ""
-        lease_duration: 86400
-        icmp_timeout_msec: 1000
-        options: []
-      dhcpv6:
-        range_start: ""
-        lease_duration: 86400
-        ra_slaac_only: false
-        ra_allow_slaac: false
-    clients: []
-    log_compress: false
-    log_localtime: false
-    log_max_backups: 0
-    log_max_size: 100
-    log_max_age: 3
-    log_file: ""
-    verbose: false
-    os:
-      group: ""
-      user: ""
-      rlimit_nofile: 0
-    schema_version: 12
+  filters:
+  - enabled: true
+    url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+    name: AdGuard DNS filter
+    id: 1
+  - enabled: true
+    url: https://adaway.org/hosts.txt
+    name: AdAway Default Blocklist
+    id: 2
+  whitelist_filters: []
+  user_rules: []
+  dhcp:
+    enabled: false
+    interface_name: ""
+    dhcpv4:
+      gateway_ip: ""
+      subnet_mask: ""
+      range_start: ""
+      range_end: ""
+      lease_duration: 86400
+      icmp_timeout_msec: 1000
+      options: []
+    dhcpv6:
+      range_start: ""
+      lease_duration: 86400
+      ra_slaac_only: false
+      ra_allow_slaac: false
+  clients: []
+  log_compress: false
+  log_localtime: false
+  log_max_backups: 0
+  log_max_size: 100
+  log_max_age: 3
+  log_file: ""
+  verbose: false
+  os:
+    group: "{{ adguard_system_user }}"
+    user: "{{ adguard_system_user }}"
+    rlimit_nofile: "{{ adguard_limit_nofile }}"
+  schema_version: 12

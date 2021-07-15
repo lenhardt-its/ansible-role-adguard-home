@@ -34,6 +34,11 @@ Example using htpasswd:
 htpasswd -bnBC 10 "" MY_NEW_PASS | tr -d ':'
 ```
 
+## Configuration in WebUI
+
+:bangbang: | When you finished you Configuration in WebUI, save you config in hosts vars.
+:---: | :---
+
 ## Requirements
 
 - Ansible >= 2.9 (It might work on previous versions, but we cannot guarantee it)

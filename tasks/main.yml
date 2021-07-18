@@ -127,7 +127,7 @@
 - name: copy adguard config
   template:
     force: true
-    src: adguard.yaml.j2
+    src: config.yaml.j2
     dest: "{{ adguard_config_dir }}/config.yaml"
     owner: "{{ adguard_system_user }}"
     group: "{{ adguard_system_group }}"

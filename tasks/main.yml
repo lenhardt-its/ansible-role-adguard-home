@@ -132,7 +132,7 @@
     owner: "{{ adguard_system_user }}"
     group: "{{ adguard_system_group }}"
     mode: 0644
-  notify: restat adguard
+  notify: reload adguard
   become: true
   tags:
     - adguard

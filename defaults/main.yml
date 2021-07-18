@@ -115,7 +115,7 @@ adguard_config:
     enabled: false
     interface_name: ""
     dhcpv4:
-      gateway_ip: ""
+      gateway_ip: "{{ adguard_web_listen_address }}"
       subnet_mask: ""
       range_start: ""
       range_end: ""
@@ -139,4 +139,3 @@ adguard_config:
     group: "{{ adguard_system_user }}"
     user: "{{ adguard_system_user }}"
     rlimit_nofile: "{{ adguard_limit_nofile }}"
-  schema_version: 12

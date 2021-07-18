@@ -1,5 +1,5 @@
 {{ ansible_managed | comment }}
 
 {% if adguard_config | length %}
-  {{ adguard_config | to_nice_yaml(sort_keys=False) | indent(2, False) }}
+{{ adguard_config | to_nice_yaml(indent=2,sort_keys=False) }}
 {% endif %}

@@ -9,12 +9,13 @@ Type=simple
 User={{ adguard_system_user }}
 Group={{ adguard_system_group }}
 #ExecReload=/bin/kill -HUP $MAINPID
-ExecReload={{ adguard_binary_install_dir }}/adguard -s reload
+ExecReload={{ adguard_binary_install_dir }}/adguard --server reload
 ExecStart={{ adguard_binary_install_dir }}/adguard \
   --config {{ adguard_config_dir }}/config.yaml \
   --work-dir {{ adguard_db_dir }} \
   --logfile syslog \
-  --no-check-update
+  --no-check-update \
+  --server run
 
 WorkingDirectory={{ adguard_db_dir }}
 SyslogIdentifier=adguard

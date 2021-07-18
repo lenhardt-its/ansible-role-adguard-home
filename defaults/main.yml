@@ -26,12 +26,12 @@ adguard_config:
   web_session_ttl: 720
   dns:
     bind_hosts:
-    - "{{ adguard_web_listen_address }}"
+      - "{{ adguard_web_listen_address }}"
     port: 53
     statistics_interval: 1
     querylog_enabled: true
     querylog_file_enabled: true
-    querylog_interval: 2160h
+    querylog_interval: 90
     querylog_size_memory: 1000
     anonymize_client_ip: false
     protection_enabled: true
@@ -46,6 +46,7 @@ adguard_config:
     refuse_any: true
     upstream_dns:
     - https://dns10.quad9.net/dns-query
+    - https://dns.cloudflare.com/dns-query
     upstream_dns_file: ""
     bootstrap_dns:
     - 9.9.9.10
@@ -80,10 +81,8 @@ adguard_config:
     cache_time: 30
     rewrites: []
     blocked_services: []
-    upstream_timeout: 10s
-    local_domain_name: lan
+    local_domain_name: ""
     resolve_clients: true
-    use_private_ptr_resolvers: true
     local_ptr_upstreams: []
   tls:
     enabled: false
@@ -109,6 +108,10 @@ adguard_config:
     url: https://adaway.org/hosts.txt
     name: AdAway Default Blocklist
     id: 2
+  - enabled: true
+    url: https://www.malwaredomainlist.com/hostslist/hosts.txt
+    name: MalwareDomainList.com Hosts List
+    id: 4
   whitelist_filters: []
   user_rules: []
   dhcp:
@@ -139,3 +142,4 @@ adguard_config:
     group: "{{ adguard_system_user }}"
     user: "{{ adguard_system_user }}"
     rlimit_nofile: "{{ adguard_limit_nofile }}"
+  schema_version: 10

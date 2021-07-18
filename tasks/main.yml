@@ -132,6 +132,7 @@
     owner: "{{ adguard_system_user }}"
     group: "{{ adguard_system_group }}"
     mode: 0644
+    validate: "{{ adguard_binary_install_dir }}/adguard --check-config -c %s"
   notify: reload adguard
   become: true
   tags:

@@ -105,8 +105,7 @@
 - name: unpack binaries
   unarchive:
     src: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
-    dest: "/tmp"
-    creates: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}/adguard"
+    dest: "/tmp/AdGuardHome"
   delegate_to: localhost
   check_mode: false
   become: true
@@ -115,7 +114,7 @@
 
 - name: propagate binaries
   copy:
-    src: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}/AdGuardHome/AdGuardHome"
+    src: "/tmp/AdGuardHome/AdGuardHome"
     dest: "{{ adguard_binary_install_dir }}/adguard"
     mode: 0755
     owner: root

@@ -88,7 +88,7 @@
 
 - name: download binary to local folder
   get_url:
-    url: "https://github.com/AdguardTeam/AdGuardHome/releases/download/v{{ adguard_version }}/AdGuardHome_linux_{{ go_arch }}.tar.gz"
+    url: "https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.106.3/AdGuardHome_linux_armv6.tar.gz"
     dest: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
   environment: "{{ proxy_env }}"
   register: _download_archive
@@ -100,17 +100,17 @@
   check_mode: false
   become: true
   tags: adguard
-  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[2]|regex_search('[0-9.]+') != adguard_version)
+  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[3]|regex_search('[0-9.]+') != adguard_version)
 
 - name: unpack binaries
   unarchive:
     src: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
-    dest: "/tmp/AdGuardHome"
+    dest: "/tmp/"
   delegate_to: localhost
   check_mode: false
   become: true
   tags: adguard
-  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[2]|regex_search('[0-9.]+') != adguard_version)
+  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[3]|regex_search('[0-9.]+') != adguard_version)
 
 - name: propagate binaries
   copy:
@@ -122,7 +122,7 @@
   notify: restart adguard
   become: true
   tags: adguard
-  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[2]|regex_search('[0-9.]+') != adguard_version)
+  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[3]|regex_search('[0-9.]+') != adguard_version)
 
 - name: copy adguard config
   template:

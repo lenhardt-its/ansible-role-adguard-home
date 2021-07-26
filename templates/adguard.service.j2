@@ -6,11 +6,7 @@ After=network-online.target
 
 [Service]
 Type=simple
-{% if ansible_os_family == "Debian" and ansible_distribution_major_version >= "8" %}
-User={{ adguard_system_user }}
-{% else %}
 User=root
-{% endif %}
 Group={{ adguard_system_group }}
 #ExecReload=/bin/kill -HUP $MAINPID
 ExecReload={{ adguard_binary_install_dir }}/adguard --server reload
@@ -19,7 +15,7 @@ ExecStart={{ adguard_binary_install_dir }}/adguard \
   --work-dir {{ adguard_db_dir }} \
   --logfile syslog \
   --no-check-update \
-  --server run
+  --service run
 
 WorkingDirectory={{ adguard_db_dir }}
 SyslogIdentifier=adguard
@@ -33,10 +29,6 @@ Environment="HTTPS_PROXY={{ adguard_https_proxy }}"
 {% endif %}
 LimitNOFILE={{ adguard_limit_nofile | default('8192') }}
 LimitMEMLOCK=infinity
-{% if ansible_os_family == "Debian" and ansible_distribution_major_version >= "8" %}
-CapabilityBoundingSet=CAP_NET_BIND_SERVICE
-AmbientCapabilities=CAP_NET_BIND_SERVICE
-{% endif %}
 NoNewPrivileges=true
 
 [Install]

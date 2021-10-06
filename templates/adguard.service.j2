@@ -9,7 +9,7 @@ Type=simple
 User=root
 Group={{ adguard_system_group }}
 #ExecReload=/bin/kill -HUP $MAINPID
-ExecReload={{ adguard_binary_install_dir }}/adguard --server reload
+ExecReload={{ adguard_binary_install_dir }}/adguard --service reload
 ExecStart={{ adguard_binary_install_dir }}/adguard \
   --config {{ adguard_config_dir }}/config.yaml \
   --work-dir {{ adguard_db_dir }} \

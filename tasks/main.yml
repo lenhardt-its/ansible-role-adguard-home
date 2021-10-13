@@ -142,4 +142,6 @@
     state: started
     enabled: true
   become: true
-  tags: adguard
+  tags:
+    - adguard
+    - adguard_config

@@ -133,7 +133,9 @@
     mode: 0644
   notify: restart adguard
   become: true
-  tags: adguard
+  tags:
+    - adguard
+    - adguard_config
 
 - name: start and enable adguard service
   systemd:

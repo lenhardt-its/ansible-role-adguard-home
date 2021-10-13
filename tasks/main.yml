@@ -60,6 +60,12 @@
   become: true
   tags: adguard
 
+- name: "set installed adguard version to {{ __adguard_current_version_output.stdout_lines[0].split(' ')[3][1:] }}"
+  set_fact:
+    adguard_installed_version:  "{{ __adguard_current_version_output.stdout_lines[0].split(' ')[3][1:] }}"
+  when: __adguard_is_installed.stat.exists
+  tags: adguard
+
 - name: get latest release
   uri:
     url: "https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest"
@@ -93,6 +99,7 @@
     suffix: AdGuard
   register: AdGuard_local_tempdir
   tags: adguard
+  when: (not __adguard_is_installed.stat.exists) or (adguard_installed_version != adguard_version)
 
 - name: download binary 
   get_url:
@@ -106,7 +113,7 @@
   # run_once: true # <-- this can't be set due to multi-arch support
   check_mode: false
   tags: adguard
-  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[2]|regex_search('[0-9.]+') != adguard_version)
+  when: (not __adguard_is_installed.stat.exists) or (adguard_installed_version != adguard_version)
 
 - name: unpack binaries
   unarchive:
@@ -115,7 +122,7 @@
     remote_src: yes
   check_mode: false
   tags: adguard
-  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[2]|regex_search('[0-9.]+') != adguard_version)
+  when: (not __adguard_is_installed.stat.exists) or (adguard_installed_version != adguard_version)
 
 - name: propagate binaries
   copy:
@@ -128,13 +135,14 @@
   notify: restart adguard
   become: true
   tags: adguard
-  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[2]|regex_search('[0-9.]+') != adguard_version)
+  when: (not __adguard_is_installed.stat.exists) or (adguard_installed_version != adguard_version)
 
 - name: remove temporary files
   ansible.builtin.file:
     path: "{{ AdGuard_local_tempdir.path }}"
     state: absent
   tags: adguard
+  when: (not __adguard_is_installed.stat.exists) or (adguard_installed_version != adguard_version)
 
 - name: copy adguard config
   template:

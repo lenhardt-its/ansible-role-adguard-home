@@ -107,7 +107,6 @@
     dest: "/tmp/"
   delegate_to: localhost
   check_mode: false
-  become: true
   tags: adguard
   when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[3]|regex_search('[0-9.]+') != adguard_version)
 

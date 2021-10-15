@@ -15,9 +15,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-20.04
-    # needs:
-    #   - yamllint
-    #   - ansiblelint
+    needs:
+      - yamllint
+      - ansiblelint
     steps:
       - name: galaxy
         uses: robertdebock/galaxy-action@1.1.1

@@ -3,7 +3,14 @@ name: ansible-lint
 on: [push, pull_request]
 
 jobs:
-  build:
+  yamllint:
+    runs-on: ubuntu-20.04
+    name: yaml-lint
+    steps:
+      - uses: actions/checkout@v2
+      - name: yamllint
+        uses: ibiqlik/action-yamllint@v3
+  ansiblelint:
     runs-on: ubuntu-latest
     name: ansible-lint
     steps:

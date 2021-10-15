@@ -60,6 +60,12 @@
   become: true
   tags: adguard
 
+- name: "set installed adguard version to {{ __adguard_current_version_output.stdout_lines[0].split(' ')[3][1:] }}"
+  set_fact:
+    adguard_installed_version:  "{{ __adguard_current_version_output.stdout_lines[0].split(' ')[3][1:] }}"
+  when: __adguard_is_installed.stat.exists
+  tags: adguard
+
 - name: get latest release
   uri:
     url: "https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest"
@@ -86,43 +92,57 @@
   tags: adguard
   when: adguard_version == "latest"
 
-- name: download binary to local folder
+
+- name: create a temporary directory
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: AdGuard
+  register: AdGuard_local_tempdir
+  tags: adguard
+  when: (not __adguard_is_installed.stat.exists) or (adguard_installed_version != adguard_version)
+
+- name: download binary 
   get_url:
-    url: "https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.106.3/AdGuardHome_linux_armv6.tar.gz"
-    dest: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
+    url: "https://github.com/AdguardTeam/AdGuardHome/releases/download/v{{ adguard_version }}/AdGuardHome_linux_{{ go_arch }}.tar.gz"
+    dest: "{{ AdGuard_local_tempdir.path }}/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
   environment: "{{ proxy_env }}"
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5
   delay: 2
   # run_once: true # <-- this can't be set due to multi-arch support
-  delegate_to: localhost
   check_mode: false
-  become: true
   tags: adguard
-  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[3]|regex_search('[0-9.]+') != adguard_version)
+  when: (not __adguard_is_installed.stat.exists) or (adguard_installed_version != adguard_version)
 
 - name: unpack binaries
   unarchive:
-    src: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
-    dest: "/tmp/"
-  delegate_to: localhost
+    src: "{{ AdGuard_local_tempdir.path }}/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "{{ AdGuard_local_tempdir.path }}"
+    remote_src: yes
   check_mode: false
-  become: true
   tags: adguard
-  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[3]|regex_search('[0-9.]+') != adguard_version)
+  when: (not __adguard_is_installed.stat.exists) or (adguard_installed_version != adguard_version)
 
 - name: propagate binaries
   copy:
-    src: "/tmp/AdGuardHome/AdGuardHome"
+    src: "{{ AdGuard_local_tempdir.path }}/AdGuardHome/AdGuardHome"
     dest: "{{ adguard_binary_install_dir }}/adguard"
     mode: 0755
     owner: root
     group: root
+    remote_src: yes
   notify: restart adguard
   become: true
   tags: adguard
-  when: (not __adguard_is_installed.stat.exists) or (__adguard_current_version_output.stdout_lines[0].split(" ")[3]|regex_search('[0-9.]+') != adguard_version)
+  when: (not __adguard_is_installed.stat.exists) or (adguard_installed_version != adguard_version)
+
+- name: remove temporary files
+  ansible.builtin.file:
+    path: "{{ AdGuard_local_tempdir.path }}"
+    state: absent
+  tags: adguard
+  when: (not __adguard_is_installed.stat.exists) or (adguard_installed_version != adguard_version)
 
 - name: copy adguard config
   template:
@@ -148,7 +168,9 @@
     mode: 0644
   notify: restart adguard
   become: true
-  tags: adguard
+  tags:
+    - adguard
+    - adguard_config
 
 - name: start and enable adguard service
   systemd:
@@ -157,4 +179,6 @@
     state: started
     enabled: true
   become: true
-  tags: adguard
+  tags:
+    - adguard
+    - adguard_config

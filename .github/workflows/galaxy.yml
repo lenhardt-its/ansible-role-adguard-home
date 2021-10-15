@@ -6,7 +6,7 @@ on:
     tags:
       - "*"
   workflow_run:
-    workflows: ["yamllint","ansiblelint"]
+    workflows: ["yamllint", "ansiblelint"]
     branches: [master]
     types: 
       - completed

@@ -1,6 +1,6 @@
 ---
 proxy_env: {}
-adguard_version: 0.106.3
+adguard_version: 0.107.0
 adguard_binary_install_dir: /usr/local/bin
 adguard_config_dir: /etc/adguard
 adguard_db_dir: /var/lib/adguard
@@ -31,7 +31,7 @@ adguard_config:
     statistics_interval: 90
     querylog_enabled: true
     querylog_file_enabled: true
-    querylog_interval: 7
+    querylog_interval: 2160h
     querylog_size_memory: 1000
     anonymize_client_ip: false
     protection_enabled: true
@@ -162,4 +162,4 @@ adguard_config:
     group: "{{ adguard_system_user }}"
     user: "{{ adguard_system_user }}"
     rlimit_nofile: "{{ adguard_limit_nofile }}"
-  schema_version: 10
+  schema_version: 12

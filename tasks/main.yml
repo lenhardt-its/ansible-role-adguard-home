@@ -103,8 +103,16 @@
 
 - name: download binary 
   get_url:
+<<<<<<< HEAD
     url: "https://github.com/AdguardTeam/AdGuardHome/releases/download/v{{ adguard_version }}/AdGuardHome_linux_{{ go_arch }}.tar.gz"
     dest: "{{ adguard_local_tempdir.path }}/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
+||||||| constructed merge base
+    url: "https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.106.3/AdGuardHome_linux_armv6.tar.gz"
+    dest: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
+=======
+    url: "https://github.com/AdguardTeam/AdGuardHome/releases/download/v{{ adguard_version }}/AdGuardHome_linux_armv6.tar.gz"
+    dest: "/tmp/adguard-{{ adguard_version }}.linux-{{ go_arch }}.tar.gz"
+>>>>>>> fix ewrrors
   environment: "{{ proxy_env }}"
   register: _download_archive
   until: _download_archive is succeeded

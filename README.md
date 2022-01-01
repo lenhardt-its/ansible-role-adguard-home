@@ -50,7 +50,7 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | Name           | Default Value | Description                        |
 | -------------- | ------------- | -----------------------------------|
 | `proxy_env` | {} | Proxy environment variables for Client|
-| `adguard_version` | 0.106.3 | AdGuardHome package version. Also accepts `latest` as parameter. |
+| `adguard_version` | 0.107.0 | AdGuardHome package version. Also accepts `latest` as parameter. |
 | `adguard_web_listen_address` | 0.0.0.0 | Address on which adguard-home will be listening |
 | `adguard_web_listen_port` | 3200 | Port on which adguard-home will be listening |
 | `adguard_config_dir` | /etc/adguard | Path to directory with adguard-home configuration |

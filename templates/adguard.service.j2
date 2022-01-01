@@ -6,7 +6,7 @@ After=network-online.target
 
 [Service]
 Type=simple
-User="{{ adguard_system_user }}"
+User={{ adguard_system_user }}
 Group={{ adguard_system_group }}
 #ExecReload=/bin/kill -HUP $MAINPID
 ExecReload={{ adguard_binary_install_dir }}/adguard -s reload

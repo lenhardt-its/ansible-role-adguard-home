@@ -1,6 +1,6 @@
 ---
 proxy_env: {}
-adguard_version: 0.107.0
+adguard_version: 0.107.9
 adguard_binary_install_dir: /usr/local/bin
 adguard_config_dir: /etc/adguard
 adguard_db_dir: /var/lib/adguard

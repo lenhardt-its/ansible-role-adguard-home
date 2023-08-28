@@ -10,6 +10,9 @@ galaxy_info:
       versions:
         - focal
         - bionic
+    - name: Debian
+      versions:
+        - bullseye
   galaxy_tags:
   - system
   - network

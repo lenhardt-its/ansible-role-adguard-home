@@ -52,8 +52,6 @@
 
 - name: gather currently installed version (if any)
   command: "{{ adguard_binary_install_dir }}/adguard --version"
-  args:
-    warn: false
   changed_when: false
   register: __adguard_current_version_output
   when: __adguard_is_installed.stat.exists

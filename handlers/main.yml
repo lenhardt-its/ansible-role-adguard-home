@@ -1,14 +1,14 @@
 ---
-- name: restart adguard
-  systemd:
+- name: Restart adguard
+  ansible.builtin.systemd:
     daemon_reload: true
     name: adguard
     state: restarted
   become: true
   tags: adguard
 
-- name: reload adguard
-  systemd:
+- name: Reload adguard
+  ansible.builtin.systemd:
     name: adguard
     state: reloaded
   become: true
